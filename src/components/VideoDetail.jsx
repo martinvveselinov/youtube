@@ -6,10 +6,12 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 import { Videos, Loader } from "./";
 import { fetchFromAPI } from "../utils/fetchFromAPI";
+import { loadFromLocalStorage, saveToLocalStorage } from "../utils/localStorageUtils";
 
 const VideoDetail = () => {
   const [videoDetail, setVideoDetail] = useState(null);
   const [videos, setVideos] = useState(null);
+  const [playlist, setPlaylist] = useState(loadFromLocalStorage('playlist') || []);
   const { id } = useParams();
 
   useEffect(() => {
@@ -19,6 +21,19 @@ const VideoDetail = () => {
     fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
       .then((data) => setVideos(data.items))
   }, [id]);
+
+  const addToPlaylist = (video) => {
+    if(playlist.includes(video.id)) return;
+    const newPlaylist = [...playlist, video.id.videoId];
+    setPlaylist(newPlaylist);
+    saveToLocalStorage('playlist', newPlaylist);
+  };
+
+  const removeFromPlaylist = (videoId) => {
+    const newPlaylist = playlist.filter(id => id !== videoId);
+    setPlaylist(newPlaylist);
+    saveToLocalStorage('playlist', newPlaylist);
+  };
 
   if(!videoDetail?.snippet) return <Loader />;
 
@@ -52,7 +67,7 @@ const VideoDetail = () => {
           </Box>
         </Box>
         <Box px={2} py={{ md: 1, xs: 5 }} justifyContent="center" alignItems="center" >
-          <Videos videos={videos} direction="column" />
+          <Videos videos={videos} direction="column" addToPlaylist={addToPlaylist} removeFromPlaylist={removeFromPlaylist} playlist={playlist} />
         </Box>
       </Stack>
     </Box>

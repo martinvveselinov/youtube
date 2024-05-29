@@ -57,15 +57,13 @@ const Feed = () => {
   }, [selectedCategory, sortOrder]);
 
   const addToPlaylist = (video) => {
-    console.log(video);
+    if(playlist.includes(video.id)) return;
     const newPlaylist = [...playlist, video.id];
     setPlaylist(newPlaylist);
     saveToLocalStorage('playlist', newPlaylist);
   };
 
   const removeFromPlaylist = (videoId) => {
-    console.log(playlist);
-    console.log(videoId);
     const newPlaylist = playlist.filter(id => id !== videoId);
     setPlaylist(newPlaylist);
     saveToLocalStorage('playlist', newPlaylist);
